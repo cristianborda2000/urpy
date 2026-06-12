@@ -20,6 +20,7 @@ const heartBurst = document.querySelector("[data-heart-burst]");
 const lyricMoment = document.querySelector("[data-lyric-moment]");
 const lyricStars = document.querySelector("[data-lyric-stars]");
 const lyricText = document.querySelector("[data-lyric-text]");
+const openLetter = document.querySelector("[data-open-letter]");
 const stories = [...document.querySelectorAll(".story")];
 const storiesRoot = document.querySelector("[data-stories]");
 const storyProgress = document.querySelector("[data-story-progress]");
@@ -381,6 +382,14 @@ if (startPresent) {
     presentOpening?.classList.add("is-hidden");
     showStory(0);
     syncPlayer();
+  });
+}
+
+if (openLetter) {
+  openLetter.addEventListener("click", (event) => {
+    event.stopPropagation();
+    openLetter.closest(".letter-status")?.classList.add("is-letter-open");
+    floatHearts({ count: 72, intense: true });
   });
 }
 
