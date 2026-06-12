@@ -197,27 +197,74 @@ function syncPlayer() {
   }
 }
 
-function floatHearts() {
+function floatHearts(options = {}) {
   if (!heartBurst) return;
 
-  const count = 36;
+  const count = options.count || 36;
+  const intense = options.intense || false;
+
   for (let index = 0; index < count; index += 1) {
     const heart = document.createElement("span");
-    const drift = Math.round((Math.random() - 0.5) * 170);
-    const delay = Math.random() * 0.65;
-    const size = Math.random() * 1.15 + 1.15;
+    const drift = Math.round((Math.random() - 0.5) * (intense ? 280 : 170));
+    const delay = Math.random() * (intense ? 0.95 : 0.65);
+    const size = Math.random() * (intense ? 1.8 : 1.15) + (intense ? 1.45 : 1.15);
     const colors = ["#ff1f4f", "#e5163f", "#ff5f7e", "#d80f35", "#ff7a91"];
 
     heart.textContent = "\u2665";
-    heart.style.left = `${20 + Math.random() * 60}%`;
+    heart.style.left = `${intense ? 6 + Math.random() * 88 : 20 + Math.random() * 60}%`;
     heart.style.color = colors[Math.floor(Math.random() * colors.length)];
     heart.style.setProperty("--drift", `${drift}px`);
     heart.style.setProperty("--delay", `${delay}s`);
     heart.style.setProperty("--scale", size.toFixed(2));
+    heart.style.setProperty("--rise", intense ? `${58 + Math.random() * 22}dvh` : "50dvh");
     heartBurst.appendChild(heart);
 
     heart.addEventListener("animationend", () => heart.remove(), { once: true });
   }
+}
+
+function typeOpeningText() {
+  const paragraphs = [...document.querySelectorAll(".present-opening__content p")];
+  if (!paragraphs.length) return;
+
+  const lines = paragraphs.map((paragraph) => {
+    if (!paragraph.dataset.fullText) {
+      paragraph.dataset.fullText = paragraph.textContent.trim();
+    }
+    paragraph.textContent = "";
+    paragraph.classList.remove("is-current", "is-complete");
+    return paragraph.dataset.fullText;
+  });
+
+  let paragraphIndex = 0;
+  let charIndex = 0;
+
+  function typeNextCharacter() {
+    const paragraph = paragraphs[paragraphIndex];
+    const text = lines[paragraphIndex];
+    if (!paragraph || !text) return;
+
+    paragraphs.forEach((item) => item.classList.remove("is-current"));
+    paragraph.classList.add("is-current");
+    paragraph.textContent = text.slice(0, charIndex + 1);
+    charIndex += 1;
+
+    if (charIndex < text.length) {
+      window.setTimeout(typeNextCharacter, 34);
+      return;
+    }
+
+    paragraph.classList.remove("is-current");
+    paragraph.classList.add("is-complete");
+    paragraphIndex += 1;
+    charIndex = 0;
+
+    if (paragraphIndex < paragraphs.length) {
+      window.setTimeout(typeNextCharacter, 360);
+    }
+  }
+
+  window.setTimeout(typeNextCharacter, 780);
 }
 
 function showLyricMoment() {
@@ -320,7 +367,8 @@ if (openPresent && presentOpening) {
     event.stopPropagation();
     if (presentOpening.classList.contains("is-opened")) return;
     presentOpening.classList.add("is-opened");
-    floatHearts();
+    floatHearts({ count: 96, intense: true });
+    typeOpeningText();
     window.setTimeout(() => startPresent?.focus(), 700);
     window.setTimeout(() => presentOpening.classList.add("is-gift-gone"), 1280);
   });

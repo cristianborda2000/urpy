@@ -367,7 +367,7 @@ main {
 
   100% {
     opacity: 0;
-    transform: translate3d(var(--drift, 0), -50dvh, 0) scale(1.42);
+    transform: translate3d(var(--drift, 0), calc(-1 * var(--rise, 50dvh)), 0) scale(1.42);
   }
 }
 
@@ -881,6 +881,14 @@ p {
   font-size: clamp(1rem, 4vw, 1.12rem);
   font-weight: 500;
   line-height: 1.58;
+}
+
+.present-opening__content p.is-current::after {
+  content: "|";
+  display: inline-block;
+  margin-left: 0.08em;
+  color: var(--gold);
+  animation: lyricCaret 760ms steps(1, end) infinite;
 }
 
 .present-opening__content button {
