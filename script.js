@@ -224,6 +224,35 @@ function floatHearts(options = {}) {
   }
 }
 
+function floatFlowers(options = {}) {
+  if (!heartBurst) return;
+
+  const count = options.count || 64;
+  const flowers = ["\u273f", "\u273d", "\u2740", "\u2665"];
+  const colors = ["#f4d58d", "#ff9aae", "#fff3c4", "#e86f8a", "#f8c7d0"];
+
+  for (let index = 0; index < count; index += 1) {
+    const flower = document.createElement("span");
+    const drift = Math.round((Math.random() - 0.5) * 320);
+    const delay = Math.random() * 1.1;
+    const size = Math.random() * 1.65 + 1.05;
+    const spin = Math.round((Math.random() - 0.5) * 280);
+
+    flower.classList.add("is-flower");
+    flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+    flower.style.left = `${4 + Math.random() * 92}%`;
+    flower.style.color = colors[Math.floor(Math.random() * colors.length)];
+    flower.style.setProperty("--drift", `${drift}px`);
+    flower.style.setProperty("--delay", `${delay}s`);
+    flower.style.setProperty("--scale", size.toFixed(2));
+    flower.style.setProperty("--rise", `${62 + Math.random() * 24}dvh`);
+    flower.style.setProperty("--spin", `${spin}deg`);
+    heartBurst.appendChild(flower);
+
+    flower.addEventListener("animationend", () => flower.remove(), { once: true });
+  }
+}
+
 function typeOpeningText() {
   const paragraphs = [...document.querySelectorAll(".present-opening__content p")];
   if (!paragraphs.length) return;
@@ -389,7 +418,7 @@ if (openLetter) {
   openLetter.addEventListener("click", (event) => {
     event.stopPropagation();
     openLetter.closest(".letter-status")?.classList.add("is-letter-open");
-    floatHearts({ count: 72, intense: true });
+    floatFlowers({ count: 90 });
   });
 }
 
