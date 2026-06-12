@@ -1435,6 +1435,11 @@ p {
   text-align: center;
 }
 
+.letter-status.is-letter-open .letter-status__wrap {
+  align-content: start;
+  padding-top: clamp(0.25rem, 2.4dvh, 1.1rem);
+}
+
 .letter-envelope {
   position: relative;
   width: min(78vw, 340px);
@@ -1559,11 +1564,11 @@ p {
 }
 
 .letter-status.is-letter-open .letter-status__paper {
-  max-height: min(82dvh, 780px);
+  max-height: min(84dvh, 790px);
   padding: clamp(0.95rem, 3.6vw, 1.35rem);
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0) scale(1);
+  transform: translateY(-4px) scale(1);
 }
 
 .status-intro {
