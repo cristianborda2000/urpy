@@ -1,0 +1,462 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#081426" />
+    <title>Feliz Dia dos Namorados</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=Playfair+Display:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body class="has-present-opening">
+    <div class="gift-loader" data-gift-loader>
+      <div class="gift-loader__box">
+        <span></span>
+        <p>Carregando presente...</p>
+      </div>
+    </div>
+
+    <canvas id="stars" class="stars" aria-hidden="true"></canvas>
+    <div class="heart-burst" data-heart-burst aria-hidden="true"></div>
+    <div class="lyric-moment" data-lyric-moment aria-hidden="true">
+      <div class="lyric-moment__stars" data-lyric-stars></div>
+      <p data-lyric-text data-full-text="Y yo te prometo, que todas las estrellas del cielo, ser&aacute;n tuyas"></p>
+    </div>
+    <audio id="loveSong" src="assets/audio/alpaquitay.mp3" preload="metadata" loop playsinline></audio>
+
+    <section class="present-opening" data-present-opening aria-label="Abrir presente">
+      <button class="present-opening__gift" type="button" data-open-present aria-label="Abrir presente">
+        <span class="present-opening__lid"></span>
+        <span class="present-opening__body"></span>
+        <span class="present-opening__ribbon present-opening__ribbon--vertical"></span>
+        <span class="present-opening__ribbon present-opening__ribbon--horizontal"></span>
+        <span class="present-opening__sparkles" aria-hidden="true"></span>
+      </button>
+      <p class="present-opening__hint">Toque no presente</p>
+      <div class="present-opening__content">
+        <p>
+          Eu ainda n&atilde;o sei programar direito, estou aprendendo agora, mas fiz isso para voc&ecirc; com todo o carinho do mundo.
+        </p>
+        <p>
+          Porque ver o seu sorriso n&atilde;o tem pre&ccedil;o. N&atilde;o existe tempo que pague a felicidade de te ver feliz.
+        </p>
+        <button type="button" data-start-present>Abrir meu presente</button>
+      </div>
+    </section>
+
+    <header class="story-top" aria-label="Topo dos status">
+      <div class="story-progress" data-story-progress></div>
+      <div class="story-top__bar">
+        <button type="button" aria-label="Voltar" data-prev-story>&lsaquo;</button>
+        <strong aria-hidden="true"></strong>
+        <button type="button" aria-label="Tocar ou pausar m&uacute;sica" data-play-music data-play-icon></button>
+      </div>
+    </header>
+
+    <main class="stories" data-stories>
+      <section id="musica" class="section player-card story is-active" aria-label="Player da m&uacute;sica">
+        <div class="player-card__top">
+          <span>v</span>
+          <strong>Juntos para sempre</strong>
+          <span>&bull;&bull;&bull;</span>
+        </div>
+        <div class="player-card__cover">
+          <img src="assets/fotos/musica.jpeg" alt="Cristhian e Urpy na capa da m&uacute;sica" />
+        </div>
+        <div class="player-card__meta">
+          <div>
+            <h2>ALPAQUITAY</h2>
+            <p>Pelo D'Ambrosio</p>
+          </div>
+          <button type="button" data-play-music data-play-icon aria-label="Tocar ou pausar m&uacute;sica"></button>
+        </div>
+        <button class="player-card__bar" type="button" aria-label="Avan&ccedil;ar m&uacute;sica" data-seek-bar>
+          <span data-play-progress></span>
+        </button>
+        <div class="player-card__time">
+          <span data-current-time>0:00</span>
+          <span data-remaining-time>-0:00</span>
+        </div>
+        <div class="player-card__controls">
+          <button type="button" aria-label="Reiniciar m&uacute;sica" data-restart-music>&#8644;</button>
+          <button type="button" aria-label="Voltar 10 segundos" data-back-music>&#9664;</button>
+          <button type="button" class="player-card__pause" aria-label="Tocar ou pausar m&uacute;sica" data-play-music data-play-icon></button>
+          <button type="button" aria-label="Avancar 10 segundos" data-forward-music>&#9654;</button>
+          <button type="button" aria-label="Repetir m&uacute;sica" data-loop-music>&#8635;</button>
+        </div>
+        <p data-music-status></p>
+      </section>
+
+      <section class="section couple-card story" aria-label="Tempo juntos">
+        <img src="assets/fotos/casal-01.jpeg" alt="Cristhian e Urpy juntos" />
+        <div class="couple-card__body">
+          <h2>Cristhian e Urpy</h2>
+          <p>Desde 16/09/2016 &agrave;s 08:22 am</p>
+          <div class="couple-card__stats">
+            <article><strong data-count="years">0</strong><span>Anos</span></article>
+            <article><strong data-count="months">0</strong><span>Meses</span></article>
+            <article><strong data-count="days-part">0</strong><span>Dias</span></article>
+            <article><strong data-count="hours-part">0</strong><span>Horas</span></article>
+            <article><strong data-count="minutes-part">0</strong><span>Minutos</span></article>
+            <article><strong data-count="seconds-part">0</strong><span>Segundos</span></article>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Foto em polaroid">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">uma lembran&ccedil;a guardada</p>
+          <div class="polaroid-stack polaroid-stack--one">
+            <figure class="polaroid-status__photo">
+              <img src="assets/fotos/polaroid-01.jpeg" alt="Cristhian e Urpy em uma lembran&ccedil;a especial" />
+              <figcaption>Uma das primeiras fotos juntos</figcaption>
+              <small>23/09/2016 - Deck da Liberdade</small>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="Foto em polaroid de 2017">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">mais um capitulo nosso</p>
+          <div class="polaroid-stack polaroid-stack--two">
+            <figure class="polaroid-status__photo polaroid-status__photo--back">
+              <img src="assets/fotos/polaroid-01.jpeg" alt="" />
+              <figcaption>Uma das primeiras fotos juntos</figcaption>
+              <small>23/09/2016</small>
+            </figure>
+            <figure class="polaroid-status__photo">
+              <img src="assets/fotos/polaroid-02.jpeg" alt="Cristhian e Urpy em 24 de junho de 2017" />
+              <figcaption>Mais uma lembran&ccedil;a com voc&ecirc;</figcaption>
+              <small>24/06/2017</small>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Primeira selfie juntos">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">selfie que virou hist&oacute;ria</p>
+          <div class="polaroid-stack polaroid-stack--three">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two">
+              <img src="assets/fotos/polaroid-01.jpeg" alt="" />
+              <figcaption>Uma das primeiras fotos juntos</figcaption>
+              <small>23/09/2016</small>
+            </figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back">
+              <img src="assets/fotos/polaroid-02.jpeg" alt="" />
+              <figcaption>Mais uma lembran&ccedil;a com voc&ecirc;</figcaption>
+              <small>24/06/2017</small>
+            </figure>
+            <figure class="polaroid-status__photo">
+              <img src="assets/fotos/polaroid-03.jpeg" alt="Primeira selfie de Cristhian e Urpy juntos" />
+              <figcaption>Primeira selfie juntos</figcaption>
+              <small>O come&ccedil;o de tantas mem&oacute;rias</small>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="Abra&ccedil;o gostoso">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">um abra&ccedil;o nosso</p>
+          <div class="polaroid-stack polaroid-stack--four">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three">
+              <img src="assets/fotos/polaroid-01.jpeg" alt="" />
+              <figcaption>Uma das primeiras fotos juntos</figcaption>
+              <small>23/09/2016</small>
+            </figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two">
+              <img src="assets/fotos/polaroid-02.jpeg" alt="" />
+              <figcaption>Mais uma lembran&ccedil;a com voc&ecirc;</figcaption>
+              <small>24/06/2017</small>
+            </figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back">
+              <img src="assets/fotos/polaroid-03.jpeg" alt="" />
+              <figcaption>Primeira selfie juntos</figcaption>
+              <small>O come&ccedil;o de tantas mem&oacute;rias</small>
+            </figure>
+            <figure class="polaroid-status__photo">
+              <img src="assets/fotos/polaroid-04.jpeg" alt="Cristhian e Urpy abracados" />
+              <figcaption>Que abra&ccedil;o gostoso</figcaption>
+              <small>Meu lugar favorito</small>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Dia da sua formatura">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">um dia de orgulho</p>
+          <div class="polaroid-stack polaroid-stack--five">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four">
+              <img src="assets/fotos/polaroid-01.jpeg" alt="" />
+              <figcaption>Uma das primeiras fotos juntos</figcaption>
+              <small>23/09/2016</small>
+            </figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three">
+              <img src="assets/fotos/polaroid-02.jpeg" alt="" />
+              <figcaption>Mais uma lembran&ccedil;a com voc&ecirc;</figcaption>
+              <small>24/06/2017</small>
+            </figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two">
+              <img src="assets/fotos/polaroid-03.jpeg" alt="" />
+              <figcaption>Primeira selfie juntos</figcaption>
+              <small>O come&ccedil;o de tantas mem&oacute;rias</small>
+            </figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back">
+              <img src="assets/fotos/polaroid-04.jpeg" alt="" />
+              <figcaption>Que abra&ccedil;o gostoso</figcaption>
+              <small>Meu lugar favorito</small>
+            </figure>
+            <figure class="polaroid-status__photo">
+              <img src="assets/fotos/polaroid-05.jpeg" alt="Cristhian e Urpy no dia da formatura" />
+              <figcaption>Dia da sua formatura</figcaption>
+              <small>Orgulho de voc&ecirc;</small>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="Primeiro beijo">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">um beijo para sempre</p>
+          <div class="polaroid-stack polaroid-stack--six">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four">
+              <img src="assets/fotos/polaroid-02.jpeg" alt="" />
+              <figcaption>Mais uma lembran&ccedil;a com voc&ecirc;</figcaption>
+              <small>24/06/2017</small>
+            </figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three">
+              <img src="assets/fotos/polaroid-03.jpeg" alt="" />
+              <figcaption>Primeira selfie juntos</figcaption>
+              <small>O come&ccedil;o de tantas mem&oacute;rias</small>
+            </figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two">
+              <img src="assets/fotos/polaroid-04.jpeg" alt="" />
+              <figcaption>Que abra&ccedil;o gostoso</figcaption>
+              <small>Meu lugar favorito</small>
+            </figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back">
+              <img src="assets/fotos/polaroid-05.jpeg" alt="" />
+              <figcaption>Dia da sua formatura</figcaption>
+              <small>Orgulho de voc&ecirc;</small>
+            </figure>
+            <figure class="polaroid-status__photo">
+              <img src="assets/fotos/polaroid-06.jpeg" alt="Cristhian e Urpy no primeiro beijo" />
+              <figcaption>El primer beso, &iexcl;es para siempre!</figcaption>
+              <small>Nuestro recuerdo eterno</small>
+            </figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Lembra do zool&oacute;gico">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">um passeio que ficou guardado</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-03.jpeg" alt="" /><figcaption>Primeira selfie juntos</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-04.jpeg" alt="" /><figcaption>Que abra&ccedil;o gostoso</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-05.jpeg" alt="" /><figcaption>Dia da sua formatura</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-06.jpeg" alt="" /><figcaption>El primer beso, &iexcl;es para siempre!</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-07.jpeg" alt="Cristhian e Urpy no zool&oacute;gico" /><figcaption>Lembra do zool&oacute;gico?</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="Primeiro encontro de casais">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">nosso mundo encontrando outros mundos</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-04.jpeg" alt="" /><figcaption>Que abra&ccedil;o gostoso</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-05.jpeg" alt="" /><figcaption>Dia da sua formatura</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-06.jpeg" alt="" /><figcaption>El primer beso, &iexcl;es para siempre!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-07.jpeg" alt="" /><figcaption>Lembra do zool&oacute;gico?</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-08.jpeg" alt="Primeiro encontro de casais" /><figcaption>Primeiro encontro de casais</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Como esquecer S&atilde;o Roque">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">um lugar que virou saudade</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-05.jpeg" alt="" /><figcaption>Dia da sua formatura</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-06.jpeg" alt="" /><figcaption>El primer beso, &iexcl;es para siempre!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-07.jpeg" alt="" /><figcaption>Lembra do zool&oacute;gico?</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-08.jpeg" alt="" /><figcaption>Primeiro encontro de casais</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-09.jpeg" alt="Cristhian e Urpy em S&atilde;o Roque" /><figcaption>Como esquecer S&atilde;o Roque</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="Video massa">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">tem coisas que ficam para depois</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-06.jpeg" alt="" /><figcaption>El primer beso, &iexcl;es para siempre!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-07.jpeg" alt="" /><figcaption>Lembra do zool&oacute;gico?</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-08.jpeg" alt="" /><figcaption>Primeiro encontro de casais</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-09.jpeg" alt="" /><figcaption>Como esquecer S&atilde;o Roque</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-10.jpeg" alt="Lembran&ccedil;a especial" /><figcaption>Tem um v&iacute;deo massa, mas te mostro depois</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Amamos carne">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">nossas risadas tamb&eacute;m tem sabor</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-07.jpeg" alt="" /><figcaption>Lembra do zool&oacute;gico?</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-08.jpeg" alt="" /><figcaption>Primeiro encontro de casais</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-09.jpeg" alt="" /><figcaption>Como esquecer S&atilde;o Roque</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-10.jpeg" alt="" /><figcaption>Tem um v&iacute;deo massa, mas te mostro depois</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-11.jpeg" alt="Lembran&ccedil;a com comida" /><figcaption>Muito bom, mas amamos carne hahahaha</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="La llajta">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">un recuerdo de la llajta</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-08.jpeg" alt="" /><figcaption>Primeiro encontro de casais</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-09.jpeg" alt="" /><figcaption>Como esquecer S&atilde;o Roque</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-10.jpeg" alt="" /><figcaption>Tem um v&iacute;deo massa, mas te mostro depois</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-11.jpeg" alt="" /><figcaption>Muito bom, mas amamos carne hahahaha</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-12.jpeg" alt="La llajta" /><figcaption>La llajta, lindo recuerdo</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Estaba nublado">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">mesmo com o c&eacute;u fechado</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-09.jpeg" alt="" /><figcaption>Como esquecer S&atilde;o Roque</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-10.jpeg" alt="" /><figcaption>Tem um v&iacute;deo massa, mas te mostro depois</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-11.jpeg" alt="" /><figcaption>Muito bom, mas amamos carne hahahaha</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-12.jpeg" alt="" /><figcaption>La llajta, lindo recuerdo</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-13.jpeg" alt="Dia nublado" /><figcaption>Estaba nublado&hellip;</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="Quase n&atilde;o subimos">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">quando tudo fica perfeito</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-10.jpeg" alt="" /><figcaption>Tem um v&iacute;deo massa, mas te mostro depois</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-11.jpeg" alt="" /><figcaption>Muito bom, mas amamos carne hahahaha</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-12.jpeg" alt="" /><figcaption>La llajta, lindo recuerdo</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-13.jpeg" alt="" /><figcaption>Estaba nublado&hellip;</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-16.jpeg" alt="Tudo perfeito contigo" /><figcaption>&hellip; pero contigo todo es perfecto!</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Me encanta esta foto">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">uma foto que eu guardaria mil vezes</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-11.jpeg" alt="" /><figcaption>Muito bom, mas amamos carne hahahaha</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-12.jpeg" alt="" /><figcaption>La llajta, lindo recuerdo</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-13.jpeg" alt="" /><figcaption>Estaba nublado&hellip;</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-14.jpeg" alt="" /><figcaption>Quasi no subimos hahahaha</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-15.jpeg" alt="Foto favorita" /><figcaption>Me encanta esta foto!!</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="Contigo todo es perfecto">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">a subida que quase virou hist&oacute;ria</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-12.jpeg" alt="" /><figcaption>La llajta, lindo recuerdo</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-13.jpeg" alt="" /><figcaption>Estaba nublado&hellip;</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-14.jpeg" alt="" /><figcaption>Quasi no subimos hahahaha</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-15.jpeg" alt="" /><figcaption>Me encanta esta foto!!</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-14.jpeg" alt="Quase n&atilde;o subimos" /><figcaption>Quasi no subimos hahahaha</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Voc&ecirc; e linda">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">quando voc&ecirc; ilumina tudo</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-13.jpeg" alt="" /><figcaption>Estaba nublado&hellip;</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-14.jpeg" alt="" /><figcaption>Quasi no subimos hahahaha</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-15.jpeg" alt="" /><figcaption>Me encanta esta foto!!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-16.jpeg" alt="" /><figcaption>&hellip; pero contigo todo es perfecto!</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-17.jpeg" alt="Urpy linda" /><figcaption>Como voc&ecirc; &eacute; LINDAAA!</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="Anivers&aacute;rio em 2020">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">celebrando a sua vida</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-14.jpeg" alt="" /><figcaption>Quasi no subimos hahahaha</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-15.jpeg" alt="" /><figcaption>Me encanta esta foto!!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-16.jpeg" alt="" /><figcaption>&hellip; pero contigo todo es perfecto!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-17.jpeg" alt="" /><figcaption>Como voc&ecirc; &eacute; LINDAAA!</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-18.jpeg" alt="Anivers&aacute;rio em 2020" /><figcaption>Seu anivers&aacute;rio em 2020</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Gaaaaaaa">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">uma dessas nossas bobagens</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-15.jpeg" alt="" /><figcaption>Me encanta esta foto!!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-16.jpeg" alt="" /><figcaption>&hellip; pero contigo todo es perfecto!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-17.jpeg" alt="" /><figcaption>Como voc&ecirc; &eacute; LINDAAA!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-18.jpeg" alt="" /><figcaption>Seu anivers&aacute;rio em 2020</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-19.jpeg" alt="Gaaaaaaa" /><figcaption>Gaaaaaaa</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--right story" aria-label="Cristo Redentor">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">bem alto, mas juntos</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-16.jpeg" alt="" /><figcaption>&hellip; pero contigo todo es perfecto!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-17.jpeg" alt="" /><figcaption>Como voc&ecirc; &eacute; LINDAAA!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-18.jpeg" alt="" /><figcaption>Seu anivers&aacute;rio em 2020</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-19.jpeg" alt="" /><figcaption>Gaaaaaaa</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-20.jpeg" alt="Cristhian e Urpy no Cristo Redentor" /><figcaption>Juntos no Cristo Redentor</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <section class="section polaroid-status polaroid-status--left story" aria-label="Te amo">
+        <div class="polaroid-status__wrap">
+          <p class="eyebrow">o que eu sempre vou dizer</p>
+          <div class="polaroid-stack">
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-four"><img src="assets/fotos/polaroid-17.jpeg" alt="" /><figcaption>Como voc&ecirc; &eacute; LINDAAA!</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-three"><img src="assets/fotos/polaroid-18.jpeg" alt="" /><figcaption>Seu anivers&aacute;rio em 2020</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back polaroid-status__photo--back-two"><img src="assets/fotos/polaroid-19.jpeg" alt="" /><figcaption>Gaaaaaaa</figcaption></figure>
+            <figure class="polaroid-status__photo polaroid-status__photo--back"><img src="assets/fotos/polaroid-20.jpeg" alt="" /><figcaption>Juntos no Cristo Redentor</figcaption></figure>
+            <figure class="polaroid-status__photo"><img src="assets/fotos/polaroid-21.jpeg" alt="Te amo" /><figcaption>TE AMOOOO!!</figcaption></figure>
+          </div>
+        </div>
+      </section>
+
+      <button class="story-zone story-zone--prev" type="button" aria-label="Status anterior" data-prev-story></button>
+      <button class="story-zone story-zone--next" type="button" aria-label="Pr&oacute;ximo status" data-next-story></button>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
+</html>
+
+
