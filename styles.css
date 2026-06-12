@@ -1437,7 +1437,7 @@ p {
 
 .letter-status.is-letter-open .letter-status__wrap {
   align-content: start;
-  padding-top: clamp(0.25rem, 2.4dvh, 1.1rem);
+  padding-top: 0;
 }
 
 .letter-envelope {
@@ -1544,9 +1544,12 @@ p {
 }
 
 .letter-status.is-letter-open .letter-envelope {
+  position: absolute;
+  top: calc(5.6rem + var(--top-safe));
+  left: 50%;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-40px) scale(0.82);
+  transform: translate(-50%, -40px) scale(0.82);
 }
 
 .letter-status.is-letter-open .letter-envelope__flap {
@@ -1568,7 +1571,7 @@ p {
   padding: clamp(0.95rem, 3.6vw, 1.35rem);
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(-4px) scale(1);
+  transform: translateY(-10px) scale(1);
 }
 
 .status-intro {
