@@ -21,12 +21,19 @@ const lyricMoment = document.querySelector("[data-lyric-moment]");
 const lyricStars = document.querySelector("[data-lyric-stars]");
 const lyricText = document.querySelector("[data-lyric-text]");
 const openLetter = document.querySelector("[data-open-letter]");
+const finalCounter = document.querySelector("[data-final-counter]");
+const showInviteButton = document.querySelector("[data-show-invite]");
+const inviteNote = document.querySelector("[data-invite-note]");
+const acceptInviteButton = document.querySelector("[data-accept-invite]");
 const stories = [...document.querySelectorAll(".story")];
 const storiesRoot = document.querySelector("[data-stories]");
 const storyProgress = document.querySelector("[data-story-progress]");
 const START_DATE = new Date("2016-09-16T08:22:00");
 const STORY_DURATION = 10000;
 const LYRIC_MOMENT_TIME = 114;
+const AUDIO_END_TIME = 162;
+const WHATSAPP_INVITE_URL =
+  "https://wa.me/5511948725039?text=Eu%20aceito%20o%20convite%20para%20o%20Restaurante%20Bosco%20em%2023%2F07%2F2026%20%C3%A0s%2019%3A00.";
 
 let width = 0;
 let height = 0;
@@ -162,6 +169,9 @@ function showStory(index) {
   if (storyProgressRunning) {
     storyFrame = requestAnimationFrame(runStoryProgress);
   }
+  if (stories[storyIndex] === finalCounter && !finalCounter.classList.contains("is-invite-visible")) {
+    requestAnimationFrame(pauseStoryProgress);
+  }
 }
 
 function nextStory() {
@@ -180,8 +190,8 @@ function formatTime(value) {
 }
 
 function syncPlayer() {
-  const duration = loveSong.duration || 0;
-  const current = loveSong.currentTime || 0;
+  const duration = Math.min(loveSong.duration || AUDIO_END_TIME, AUDIO_END_TIME);
+  const current = Math.min(loveSong.currentTime || 0, duration);
   const progress = duration ? Math.min(100, (current / duration) * 100) : 0;
 
   playProgress.style.width = `${progress}%`;
@@ -352,6 +362,9 @@ async function startMusic(options = {}) {
   const showHearts = options.hearts !== false;
 
   try {
+    if (loveSong.currentTime >= AUDIO_END_TIME) {
+      loveSong.currentTime = 0;
+    }
     await loveSong.play();
     document.body.classList.add("is-playing");
     if (wasPaused) {
@@ -422,13 +435,31 @@ if (openLetter) {
   });
 }
 
+if (showInviteButton && finalCounter && inviteNote) {
+  showInviteButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    finalCounter.classList.add("is-invite-visible");
+    inviteNote.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    resumeStoryProgress();
+    floatFlowers({ count: 70 });
+  });
+}
+
+if (acceptInviteButton) {
+  acceptInviteButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    window.location.href = WHATSAPP_INVITE_URL;
+  });
+}
+
 seekBar.addEventListener("click", (event) => {
   event.stopPropagation();
-  if (!loveSong.duration) return;
+  const duration = Math.min(loveSong.duration || AUDIO_END_TIME, AUDIO_END_TIME);
+  if (!duration) return;
 
   const bounds = seekBar.getBoundingClientRect();
   const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
-  loveSong.currentTime = ratio * loveSong.duration;
+  loveSong.currentTime = ratio * duration;
   syncPlayer();
 });
 
@@ -446,7 +477,7 @@ backMusic.addEventListener("click", (event) => {
 
 forwardMusic.addEventListener("click", (event) => {
   event.stopPropagation();
-  loveSong.currentTime = Math.min(loveSong.duration || loveSong.currentTime + 10, loveSong.currentTime + 10);
+  loveSong.currentTime = Math.min(AUDIO_END_TIME, loveSong.currentTime + 10);
   syncPlayer();
 });
 
@@ -458,8 +489,13 @@ loopMusic.addEventListener("click", (event) => {
 
 loveSong.addEventListener("loadedmetadata", syncPlayer);
 loveSong.addEventListener("timeupdate", () => {
+  if (loveSong.currentTime >= AUDIO_END_TIME) {
+    loveSong.pause();
+    loveSong.currentTime = AUDIO_END_TIME;
+    document.body.classList.remove("is-playing");
+    pauseStoryProgress();
+  }
   syncPlayer();
-  watchLyricMoment();
 });
 loveSong.addEventListener("play", syncPlayer);
 loveSong.addEventListener("pause", syncPlayer);
@@ -577,6 +613,6 @@ syncPlayer();
 resizeStars();
 drawStars();
 setTimeout(() => {
-  giftLoader.classList.add("is-hidden");
+  giftLoader?.classList.add("is-hidden");
 }, 1700);
 
