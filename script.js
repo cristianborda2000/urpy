@@ -1,618 +1,173 @@
-﻿const canvas = document.querySelector("#stars");
-const ctx = canvas.getContext("2d");
-const playButtons = [...document.querySelectorAll("[data-play-music]")];
-const playIcons = [...document.querySelectorAll("[data-play-icon]")];
+"use strict";
+
+/* Parâmetros principais da experiência. */
+const PHOENIX_CONFIG = {
+  duration: 9_800,
+  speed: 1,
+  phoenixSize: 1,
+  fireIntensity: 1,
+  particles: { desktop: 82, mobile: 46 },
+  colors: { ash: "112,98,109", ember: "255,49,76", gold: "255,132,70" },
+};
+
+const root = document.querySelector("[data-experience]");
+const canvas = document.querySelector("#effects");
+const ctx = canvas.getContext("2d", { alpha: true });
+const replay = document.querySelector("[data-replay]");
 const loveSong = document.querySelector("#loveSong");
-const musicStatus = document.querySelector("[data-music-status]");
-const seekBar = document.querySelector("[data-seek-bar]");
-const playProgress = document.querySelector("[data-play-progress]");
-const currentTime = document.querySelector("[data-current-time]");
-const remainingTime = document.querySelector("[data-remaining-time]");
-const restartMusic = document.querySelector("[data-restart-music]");
-const backMusic = document.querySelector("[data-back-music]");
-const forwardMusic = document.querySelector("[data-forward-music]");
-const loopMusic = document.querySelector("[data-loop-music]");
-const giftLoader = document.querySelector("[data-gift-loader]");
-const presentOpening = document.querySelector("[data-present-opening]");
-const openPresent = document.querySelector("[data-open-present]");
-const startPresent = document.querySelector("[data-start-present]");
-const heartBurst = document.querySelector("[data-heart-burst]");
-const lyricMoment = document.querySelector("[data-lyric-moment]");
-const lyricStars = document.querySelector("[data-lyric-stars]");
-const lyricText = document.querySelector("[data-lyric-text]");
-const openLetter = document.querySelector("[data-open-letter]");
-const finalCounter = document.querySelector("[data-final-counter]");
-const showInviteButton = document.querySelector("[data-show-invite]");
-const inviteNote = document.querySelector("[data-invite-note]");
-const acceptInviteButton = document.querySelector("[data-accept-invite]");
-const stories = [...document.querySelectorAll(".story")];
-const storiesRoot = document.querySelector("[data-stories]");
-const storyProgress = document.querySelector("[data-story-progress]");
-const START_DATE = new Date("2016-09-16T08:22:00");
-const STORY_DURATION = 10000;
-const LYRIC_MOMENT_TIME = 114;
-const AUDIO_END_TIME = 162;
-const WHATSAPP_INVITE_URL =
-  "https://wa.me/5511948725039?text=Eu%20aceito%20o%20convite%20para%20o%20Restaurante%20Bosco%20em%2023%2F07%2F2026%20%C3%A0s%2019%3A00.";
+let width, height, dpr, frame, resizeFrame, startedAt, lastAt, burstDone, lastColorStep=-1, particles = [];
+const clamp = (n,a=0,b=1)=>Math.min(b,Math.max(a,n));
+const mix = (a,b,t)=>a+(b-a)*t;
+const smooth = t=>t*t*(3-2*t);
+const range = (a,b)=>Math.random()*(b-a)+a;
 
-let width = 0;
-let height = 0;
-let stars = [];
-let storyIndex = 0;
-let storyStartedAt = 0;
-let storyFrame = 0;
-let storyPausedAt = 0;
-let holdStartedAt = 0;
-let shouldIgnoreTap = false;
-let storyProgressRunning = false;
-let lyricMomentShown = false;
-let lyricTypingTimer = 0;
-let storyHoldWasPlaying = false;
+function resize(){ width=innerWidth; height=innerHeight; dpr=Math.min(devicePixelRatio||1,width<700?1.25:1.5); canvas.width=Math.round(width*dpr); canvas.height=Math.round(height*dpr); ctx.setTransform(dpr,0,0,dpr,0,0); }
 
-function resizeStars() {
-  const scale = window.devicePixelRatio || 1;
-  width = window.innerWidth;
-  height = window.innerHeight;
-  canvas.width = Math.floor(width * scale);
-  canvas.height = Math.floor(height * scale);
-  ctx.setTransform(scale, 0, 0, scale, 0, 0);
-  stars = Array.from({ length: Math.min(150, Math.floor(width / 5)) }, createStar);
-}
-
-function createStar() {
-  return {
-    x: Math.random() * width,
-    y: Math.random() * height,
-    size: Math.random() * 1.7 + 0.4,
-    alpha: Math.random() * 0.5 + 0.25,
-    speed: Math.random() * 0.18 + 0.04,
-    pulse: Math.random() * Math.PI * 2,
-  };
-}
-
-function drawStars() {
-  ctx.clearRect(0, 0, width, height);
-  for (const star of stars) {
-    star.y += star.speed;
-    star.pulse += 0.025;
-
-    if (star.y > height + 8) {
-      star.y = -8;
-      star.x = Math.random() * width;
-    }
-
-    const glow = star.alpha + Math.sin(star.pulse) * 0.18;
-    ctx.beginPath();
-    ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(244, 213, 141, ${glow})`;
-    ctx.fill();
+class Particle {
+  constructor(kind="ash",burst=false){ this.reset(kind,burst); }
+  reset(kind="ash",burst=false){
+    this.kind=kind; this.age=0; this.life=range(kind==="ash"?4200:1800,kind==="ash"?8500:4300);
+    this.x=kind==="ash"&&!burst?range(0,width):width*.5+range(-width*.24,width*.24); this.y=kind==="ash"&&!burst?range(height*.08,height*.94):height*(burst?.56:.78)+range(-height*.2,height*.15);
+    const angle=range(Math.PI*1.08,Math.PI*1.92), power=burst?range(120,390):range(12,62);
+    this.vx=Math.cos(angle)*power; this.vy=Math.sin(angle)*power-(kind==="ash"?4:42);
+    this.size=range(kind==="ash"?.5:1.1,kind==="ash"?2.7:3.8); this.alpha=range(.18,.82); this.seed=range(0,7);this.depth=Math.random();
   }
-  requestAnimationFrame(drawStars);
+  update(dt,phase,time){
+    this.age+=dt*1000;
+    if(phase>.16&&phase<.5){const dx=width*.5-this.x,dy=height*.68-this.y,dist=Math.max(50,Math.hypot(dx,dy));const strength=Math.sin(clamp((phase-.16)/.34)*Math.PI);this.vx+=(-dy/dist*42+dx/dist*12)*strength*dt;this.vy+=(dx/dist*42+dy/dist*12)*strength*dt;}
+    this.vy-=(this.kind==="ash"?3:15)*dt;this.x+=this.vx*dt;this.y+=this.vy*dt;this.vx*=.985;
+  }
+  draw(){ const t=this.age/this.life;if(t>=1)return;const a=Math.sin(t*Math.PI)*this.alpha,c=this.kind==="gold"?PHOENIX_CONFIG.colors.gold:this.kind==="ember"?PHOENIX_CONFIG.colors.ember:PHOENIX_CONFIG.colors.ash;ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.age*.001*(this.seed-3.5));if(this.kind!=="ash"&&this.depth>.78){ctx.shadowBlur=6;ctx.shadowColor=`rgba(${c},${a})`;}ctx.fillStyle=`rgba(${c},${a})`;ctx.beginPath();ctx.ellipse(0,0,this.size*(this.kind==="ash"?1.8:.65),this.size,0,0,Math.PI*2);ctx.fill();ctx.restore();}
 }
 
-storyProgress.style.setProperty("--story-count", stories.length);
-storyProgress.replaceChildren(...stories.map(() => document.createElement("span")));
+function seed(){ const amount=width<700?PHOENIX_CONFIG.particles.mobile:PHOENIX_CONFIG.particles.desktop;particles=Array.from({length:amount},(_,i)=>new Particle(i%6?"ash":"ember"));particles.forEach(p=>{p.age=range(0,p.life*.7);p.y=range(height*.15,height*.94);}); }
+function burst(){ const n=width<700?24:42;for(let i=0;i<n;i++)particles.push(new Particle(i%3?"gold":"ember",true)); }
 
-function renderStoryProgress(activeFill) {
-  [...storyProgress.children].forEach((bar, currentIndex) => {
-    const fill = currentIndex < storyIndex ? 100 : currentIndex === storyIndex ? activeFill : 0;
-    bar.style.setProperty("--fill", `${fill}%`);
-  });
+/* Desenha uma pena curva com nervura central e brilho de fogo. */
+function feather(length,widthValue,curve,hue,alpha=1,flicker=0,tone=0){
+  const tipGlow=.82+flicker*.18;
+  // A ponta usa duas curvas, evitando o triângulo rígido de uma pena pontuda.
+  const red=clamp(151+tone,90,230),blue=clamp(112-tone*.35,72,145);
+  ctx.fillStyle=`rgba(${red},31,${blue},${alpha})`;ctx.beginPath();ctx.moveTo(0,0);ctx.bezierCurveTo(length*.28,-widthValue,length*.72,curve-widthValue*.52,length*.94,curve-widthValue*.12);ctx.quadraticCurveTo(length*1.025,curve,length*.94,curve+widthValue*.12);ctx.bezierCurveTo(length*.7,curve+widthValue*.45,length*.22,widthValue*.62,0,0);ctx.fill();
+  if(flicker>.82||tone>8){ctx.strokeStyle=`rgba(255,91,91,${alpha*tipGlow*.5})`;ctx.lineWidth=Math.max(1,widthValue*.075);ctx.beginPath();ctx.moveTo(length*.76,curve*.68);ctx.quadraticCurveTo(length*.9,curve,length,curve);ctx.stroke();}
+  ctx.strokeStyle=`rgba(255,139,154,${alpha*.46})`;ctx.lineWidth=Math.max(.55,widthValue*.048);ctx.beginPath();ctx.moveTo(length*.04,0);ctx.quadraticCurveTo(length*.54,curve*.16,length*.97,curve);ctx.stroke();
 }
 
-function renderStoryProgressInstant(activeFill) {
-  storyProgress.classList.add("is-jumping");
-  renderStoryProgress(activeFill);
-  requestAnimationFrame(() => {
-    storyProgress.classList.remove("is-jumping");
-  });
-}
+function drawWing(side,open,flap,scale,time,visibility){
+  ctx.save();ctx.scale(side,1);
+  const fold=mix(1.4,.34,open), shoulderLift=flap+Math.sin(time*.0017+side)*.012*open;
+  ctx.rotate(-fold+shoulderLift);
 
-function runStoryProgress(now = performance.now()) {
-  if (!storyProgressRunning) return;
-
-  const elapsed = now - storyStartedAt;
-  const fill = Math.min(100, (elapsed / STORY_DURATION) * 100);
-  renderStoryProgress(fill);
-
-  if (fill >= 100 && storyIndex < stories.length - 1) {
-    nextStory();
-    return;
+  // Penas primárias: longas, separadas e com flexão progressiva nas pontas.
+  for(let i=0;i<9;i++){
+    const n=i/8,lag=Math.sin(time*.0022-i*.16)*.028*open;
+    const spread=mix(-.34,.48,n);
+    ctx.save();ctx.rotate(mix(-.025,spread,open)+shoulderLift*(.3+n*.8)+lag);
+    const len=scale*mix(.7,1.03,Math.sin((n*.72+.13)*Math.PI));
+    feather(len,scale*mix(.05,.072,1-Math.abs(n-.52)*1.2),scale*mix(-.015,.12,n),16+i,visibility*.82,(Math.sin(time*.008+i)+1)/2,-8);ctx.restore();
   }
 
-  if (fill >= 100) return;
-
-  storyFrame = requestAnimationFrame(runStoryProgress);
-}
-
-function startStoryProgress() {
-  if (storyProgressRunning) return;
-
-  storyProgressRunning = true;
-  storyStartedAt = performance.now();
-  cancelAnimationFrame(storyFrame);
-  storyFrame = requestAnimationFrame(runStoryProgress);
-}
-
-function pauseStoryProgress() {
-  if (!storyProgressRunning) return;
-  if (storyPausedAt) return;
-
-  storyPausedAt = performance.now();
-  cancelAnimationFrame(storyFrame);
-  document.body.classList.add("is-holding-story");
-}
-
-function resumeStoryProgress() {
-  if (!storyProgressRunning) return;
-  if (!storyPausedAt) return;
-
-  storyStartedAt += performance.now() - storyPausedAt;
-  storyPausedAt = 0;
-  document.body.classList.remove("is-holding-story");
-  storyFrame = requestAnimationFrame(runStoryProgress);
-}
-
-function showStory(index) {
-  storyIndex = Math.max(0, Math.min(index, stories.length - 1));
-  stories.forEach((story, currentIndex) => {
-    story.classList.toggle("is-active", currentIndex === storyIndex);
-  });
-
-  cancelAnimationFrame(storyFrame);
-  storyPausedAt = 0;
-  holdStartedAt = 0;
-  shouldIgnoreTap = false;
-  document.body.classList.remove("is-holding-story");
-  storyStartedAt = performance.now();
-  renderStoryProgressInstant(0);
-  if (storyProgressRunning) {
-    storyFrame = requestAnimationFrame(runStoryProgress);
+  // Penas secundárias formam volume, com origem deslocada ao longo do braço.
+  for(let i=0;i<10;i++){
+    const n=i/9,delay=Math.sin(time*.0021-i*.12)*.014*open;ctx.save();ctx.translate(scale*mix(.035,.36,n),scale*mix(-.015,.025,n));ctx.rotate(mix(-.018,mix(-.14,.42,n),open)+flap*.5+delay);
+    feather(scale*mix(.44,.66,Math.sin((n*.7+.15)*Math.PI)),scale*mix(.058,.07,1-n),scale*.065,28+i,visibility*.94,(Math.sin(time*.009+i*.7)+1)/2,2);ctx.restore();
   }
-  if (stories[storyIndex] === finalCounter && !finalCounter.classList.contains("is-invite-visible")) {
-    requestAnimationFrame(pauseStoryProgress);
+
+  // Coberturas sobrepostas escondem as articulações e definem a anatomia da asa.
+  const cover=ctx.createLinearGradient(0,-scale*.12,scale*.52,scale*.1);cover.addColorStop(0,`rgba(68,25,104,${visibility})`);cover.addColorStop(.58,`rgba(180,31,111,${visibility})`);cover.addColorStop(1,`rgba(247,47,91,${visibility*.9})`);ctx.fillStyle=cover;
+  ctx.beginPath();ctx.moveTo(-scale*.03,-scale*.055);ctx.bezierCurveTo(scale*.13,-scale*.18,scale*.38,-scale*.17,scale*.57,scale*.035);ctx.bezierCurveTo(scale*.38,scale*.14,scale*.12,scale*.12,-scale*.03,scale*.055);ctx.fill();
+  for(let i=0;i<6;i++){ctx.save();ctx.translate(scale*(.035+i*.065),-scale*.018);ctx.rotate(mix(.02,.12+i*.038,open)+Math.sin(time*.002-i*.15)*.008*open);feather(scale*mix(.27,.35,i/5),scale*.046,scale*.04,40+i,visibility*.98,0,10);ctx.restore();}
+  ctx.restore();
+}
+
+function drawTailRibbons(scale,alpha,time){
+  for(let i=-2;i<=2;i++){
+    const offset=i*scale*.027,length=scale*mix(.78,1.2,1-Math.abs(i)/3),side=i<0?-1:1;
+    const speed=.00125+(i+2)*.00011,amplitude=scale*(.055+Math.abs(i)*.012),wave=Math.sin(time*speed+i*1.17)*amplitude;
+    ctx.strokeStyle=i===0?`rgba(255,73,83,${alpha*.9})`:`rgba(${i%2?"186,39,118":"242,49,92"},${alpha*.72})`;
+    ctx.lineWidth=scale*(i===0?.018:.011);ctx.lineCap="round";
+    const tipX=offset+side*scale*.08+wave;
+    ctx.beginPath();ctx.moveTo(offset,scale*.27);ctx.bezierCurveTo(offset+side*scale*.14+wave*.2,scale*.5,offset-side*scale*.2-wave*.35,scale*.72,tipX,length);ctx.stroke();
+    ctx.fillStyle=`rgba(255,91,72,${alpha*.86})`;ctx.save();ctx.translate(tipX,length);ctx.rotate(side*.45+Math.sin(time*speed+i)*.18);ctx.beginPath();ctx.moveTo(0,0);ctx.quadraticCurveTo(scale*.095,-scale*.04,scale*.16,0);ctx.quadraticCurveTo(scale*.085,scale*.078,0,0);ctx.fill();ctx.restore();
   }
 }
 
-function nextStory() {
-  showStory(storyIndex + 1);
+function drawLegs(scale,alpha,time){
+  const motion=Math.sin(time*.0016)*scale*.006;
+  ctx.save();ctx.lineCap="round";ctx.lineJoin="round";
+  for(const side of [-1,1]){
+    const hip=side*scale*.052,kneeX=side*scale*.073+motion*side,footX=side*scale*.09;
+    ctx.strokeStyle=`rgba(176,40,101,${alpha*.9})`;ctx.lineWidth=Math.max(1.4,scale*.014);ctx.beginPath();ctx.moveTo(hip,scale*.18);ctx.bezierCurveTo(side*scale*.06,scale*.27,kneeX,scale*.34,footX,scale*.405);ctx.stroke();
+    ctx.strokeStyle=`rgba(238,65,105,${alpha*.78})`;ctx.lineWidth=Math.max(1,scale*.008);
+    for(let claw=-1;claw<=1;claw++){ctx.beginPath();ctx.moveTo(footX,scale*.405);ctx.quadraticCurveTo(footX+side*scale*(.035+claw*.006),scale*(.43+Math.abs(claw)*.008),footX+side*scale*(.062+claw*.008),scale*.414);ctx.stroke();}
+  }
+  ctx.restore();
 }
 
-function prevStory() {
-  showStory(storyIndex - 1);
+function drawBody(scale,bodyAlpha,headAlpha,tailAlpha,time){
+  ctx.save();
+  drawTailRibbons(scale,tailAlpha,time);
+  ctx.globalAlpha=bodyAlpha;
+  const body=ctx.createLinearGradient(-scale*.13,-scale*.25,scale*.15,scale*.3);body.addColorStop(0,"#5f207f");body.addColorStop(.45,"#b52a78");body.addColorStop(1,"#ed315c");ctx.fillStyle=body;ctx.beginPath();ctx.moveTo(scale*.025,-scale*.3);ctx.bezierCurveTo(-scale*.13,-scale*.19,-scale*.16,scale*.08,-scale*.035,scale*.34);ctx.bezierCurveTo(scale*.13,scale*.2,scale*.15,-scale*.12,scale*.025,-scale*.3);ctx.fill();
+  const chest=ctx.createRadialGradient(0,-scale*.03,0,0,-scale*.03,scale*.2);chest.addColorStop(0,`rgba(255,91,105,${bodyAlpha*.38})`);chest.addColorStop(1,"rgba(202,38,112,0)");ctx.fillStyle=chest;ctx.beginPath();ctx.arc(0,-scale*.03,scale*.2,0,Math.PI*2);ctx.fill();
+  drawLegs(scale,bodyAlpha,time);
+  // Pequenas penas sobrepostas dão profundidade ao peito.
+  for(let row=0;row<5;row++){const py=-scale*.18+row*scale*.075,count=3+row;for(let col=0;col<count;col++){const px=(col-(count-1)/2)*scale*.031,shade=190+row*8;ctx.fillStyle=`rgba(${shade},42,112,${bodyAlpha*.48})`;ctx.beginPath();ctx.moveTo(px-scale*.025,py);ctx.quadraticCurveTo(px,py+scale*.052,px+scale*.025,py);ctx.quadraticCurveTo(px,py+scale*.028,px-scale*.025,py);ctx.fill();}}
+  // Neck, head and beak.
+  ctx.save();ctx.globalAlpha=headAlpha;
+  ctx.beginPath();ctx.moveTo(-scale*.045,-scale*.22);ctx.bezierCurveTo(-scale*.1,-scale*.34,-scale*.015,-scale*.5,scale*.14,-scale*.465);ctx.bezierCurveTo(scale*.055,-scale*.39,scale*.085,-scale*.27,scale*.035,-scale*.19);ctx.fill();
+  // Curved crest inspired by the reference silhouette.
+  ctx.strokeStyle=`rgba(237,49,92,${headAlpha})`;ctx.lineWidth=scale*.014;ctx.lineCap="round";ctx.beginPath();ctx.moveTo(scale*.075,-scale*.47);ctx.bezierCurveTo(-scale*.01,-scale*.61,-scale*.15,-scale*.53,-scale*.07,-scale*.42);ctx.stroke();ctx.beginPath();ctx.moveTo(scale*.1,-scale*.465);ctx.bezierCurveTo(scale*.02,-scale*.57,-scale*.1,-scale*.48,-scale*.025,-scale*.4);ctx.stroke();
+  ctx.fillStyle="#ff6b58";ctx.beginPath();ctx.moveTo(scale*.135,-scale*.475);ctx.lineTo(scale*.245,-scale*.445);ctx.lineTo(scale*.132,-scale*.42);ctx.closePath();ctx.fill();
+  ctx.fillStyle="#ffd6a4";ctx.shadowBlur=6;ctx.shadowColor="#ff375f";ctx.beginPath();ctx.arc(scale*.112,-scale*.465,Math.max(1.2,scale*.007),0,Math.PI*2);ctx.fill();ctx.restore();ctx.restore();
 }
 
-function formatTime(value) {
-  const total = Math.max(0, Math.floor(Number.isFinite(value) ? value : 0));
-  const minutes = Math.floor(total / 60);
-  const seconds = String(total % 60).padStart(2, "0");
-  return `${minutes}:${seconds}`;
+function drawEnergyVortex(progress,time){
+  const energy=Math.sin(clamp((progress-.13)/.34)*Math.PI);if(energy<=0)return;
+  ctx.save();ctx.translate(width*.5,height*.7);ctx.globalCompositeOperation="lighter";ctx.lineCap="round";
+  for(let i=0;i<7;i++){const phase=time*.0012+i*.9,radius=mix(18,Math.min(width,height)*.2,i/6)*energy;ctx.strokeStyle=`rgba(${i%2?"232,45,105":"255,100,55"},${energy*(.18+i*.025)})`;ctx.lineWidth=1+i*.18;ctx.beginPath();ctx.arc(Math.cos(phase)*radius*.12,-i*height*.025,radius,phase,phase+Math.PI*.9);ctx.stroke();}
+  ctx.restore();
 }
 
-function syncPlayer() {
-  const duration = Math.min(loveSong.duration || AUDIO_END_TIME, AUDIO_END_TIME);
-  const current = Math.min(loveSong.currentTime || 0, duration);
-  const progress = duration ? Math.min(100, (current / duration) * 100) : 0;
-
-  playProgress.style.width = `${progress}%`;
-  currentTime.textContent = formatTime(current);
-  remainingTime.textContent = duration ? `-${formatTime(duration - current)}` : "-0:00";
-
-  playIcons.forEach((button) => {
-    button.setAttribute("aria-label", loveSong.paused ? "Tocar musica" : "Pausar musica");
-    button.classList.toggle("is-playing", !loveSong.paused);
-  });
-
-  if (musicStatus) {
-    musicStatus.textContent = "";
-  }
+function drawClimax(progress){
+  const t=clamp((progress-.72)/.12),pulse=Math.sin(t*Math.PI);if(pulse<=0)return;
+  const radius=Math.min(width,height)*mix(.08,.48,t),glow=ctx.createRadialGradient(width*.5,height*.45,0,width*.5,height*.45,radius);glow.addColorStop(0,`rgba(255,225,172,${pulse*.2})`);glow.addColorStop(.35,`rgba(255,65,104,${pulse*.14})`);glow.addColorStop(1,"rgba(160,25,105,0)");ctx.fillStyle=glow;ctx.fillRect(0,0,width,height);
 }
 
-function floatHearts(options = {}) {
-  if (!heartBurst) return;
-
-  const count = options.count || 36;
-  const intense = options.intense || false;
-
-  for (let index = 0; index < count; index += 1) {
-    const heart = document.createElement("span");
-    const drift = Math.round((Math.random() - 0.5) * (intense ? 280 : 170));
-    const delay = Math.random() * (intense ? 0.95 : 0.65);
-    const size = Math.random() * (intense ? 1.8 : 1.15) + (intense ? 1.45 : 1.15);
-    const colors = ["#ff1f4f", "#e5163f", "#ff5f7e", "#d80f35", "#ff7a91"];
-
-    heart.textContent = "\u2665";
-    heart.style.left = `${intense ? 6 + Math.random() * 88 : 20 + Math.random() * 60}%`;
-    heart.style.color = colors[Math.floor(Math.random() * colors.length)];
-    heart.style.setProperty("--drift", `${drift}px`);
-    heart.style.setProperty("--delay", `${delay}s`);
-    heart.style.setProperty("--scale", size.toFixed(2));
-    heart.style.setProperty("--rise", intense ? `${58 + Math.random() * 22}dvh` : "50dvh");
-    heartBurst.appendChild(heart);
-
-    heart.addEventListener("animationend", () => heart.remove(), { once: true });
-  }
+function drawPhoenix(progress,time){
+  const bodyForm=smooth(clamp((progress-.27)/.17)),headForm=smooth(clamp((progress-.34)/.15)),wingForm=smooth(clamp((progress-.4)/.2)),open=smooth(clamp((progress-.54)/.2)),tailForm=smooth(clamp((progress-.53)/.18)),flight=smooth(clamp((progress-.75)/.13));if(bodyForm<=0)return;
+  const viewportUnit=Math.min(width,height*1.05),scale=viewportUnit*(width<700?.42:.29)*PHOENIX_CONFIG.phoenixSize;
+  const formation=smooth(clamp((progress-.27)/.3)),pathCurve=Math.sin(formation*Math.PI)*width*.025;
+  const y=mix(height*.82,height*.46,formation)-flight*height*.075,x=width*.5+pathCurve;
+  // Harmônicas diferentes criam subida lenta e descida firme, sem movimento de pêndulo.
+  const cycle=time*.00165,primary=Math.sin(cycle),secondary=Math.sin(cycle*2-.65)*.26;
+  const wingBeat=(primary+secondary)*.073*(1-flight*.35),flap=open<1?0:wingBeat;
+  const bodyBob=open*(Math.cos(cycle)*scale*.017+Math.cos(cycle*2)*scale*.004),bodyPitch=open*Math.sin(cycle-.4)*.014;
+  ctx.save();ctx.translate(x,y+bodyBob);ctx.rotate(bodyPitch);ctx.globalCompositeOperation="lighter";const glow=ctx.createRadialGradient(0,0,0,0,0,scale*1.12);glow.addColorStop(0,`rgba(255,72,76,${.19*bodyForm})`);glow.addColorStop(1,"rgba(184,32,105,0)");ctx.fillStyle=glow;ctx.beginPath();ctx.arc(0,0,scale*1.12,0,Math.PI*2);ctx.fill();ctx.globalCompositeOperation="source-over";
+  drawWing(-1,open,flap*.985,scale,time,wingForm);drawWing(1,open,flap,scale,time,wingForm);drawBody(scale,bodyForm,headForm,tailForm,time);ctx.restore();
 }
 
-function floatFlowers(options = {}) {
-  if (!heartBurst) return;
-
-  const count = options.count || 64;
-  const flowers = ["\u273f", "\u273d", "\u2740", "\u2665"];
-  const colors = ["#f4d58d", "#ff9aae", "#fff3c4", "#e86f8a", "#f8c7d0"];
-
-  for (let index = 0; index < count; index += 1) {
-    const flower = document.createElement("span");
-    const drift = Math.round((Math.random() - 0.5) * 320);
-    const delay = Math.random() * 1.1;
-    const size = Math.random() * 1.65 + 1.05;
-    const spin = Math.round((Math.random() - 0.5) * 280);
-
-    flower.classList.add("is-flower");
-    flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
-    flower.style.left = `${4 + Math.random() * 92}%`;
-    flower.style.color = colors[Math.floor(Math.random() * colors.length)];
-    flower.style.setProperty("--drift", `${drift}px`);
-    flower.style.setProperty("--delay", `${delay}s`);
-    flower.style.setProperty("--scale", size.toFixed(2));
-    flower.style.setProperty("--rise", `${62 + Math.random() * 24}dvh`);
-    flower.style.setProperty("--spin", `${spin}deg`);
-    heartBurst.appendChild(flower);
-
-    flower.addEventListener("animationend", () => flower.remove(), { once: true });
-  }
+function setPhases(p){root.classList.toggle("phase-embers",p>=.1);root.classList.toggle("phase-wings",p>=.54);root.classList.toggle("phase-flight",p>=.75);root.classList.toggle("phase-complete",p>=.9);}
+function render(now){
+  if(!startedAt)startedAt=now;
+  const elapsed=(now-startedAt)*PHOENIX_CONFIG.speed,p=clamp(elapsed/PHOENIX_CONFIG.duration),dt=Math.min(32,lastAt?now-lastAt:16)/1000;
+  lastAt=now;setPhases(p);
+  const colorReveal=smooth(clamp((p-.54)/.2)),colorStep=Math.round(colorReveal*100);
+  if(colorStep!==lastColorStep){root.style.setProperty("--color-progress",colorReveal.toFixed(2));lastColorStep=colorStep;}
+  if(!burstDone&&p>=.74){burstDone=true;burst();}
+  ctx.clearRect(0,0,width,height);
+  particles.forEach(part=>{part.update(dt,p,elapsed);if(part.age>=part.life)part.reset(p>.38?(Math.random()>.35?"ember":"gold"):"ash");});
+  // Plano traseiro, ave e plano frontal são renderizados separadamente.
+  particles.forEach(part=>{if(part.depth<.62)part.draw();});
+  drawEnergyVortex(p,elapsed);
+  drawPhoenix(p,elapsed);
+  drawClimax(p);
+  particles.forEach(part=>{if(part.depth>=.62)part.draw();});
+  frame=requestAnimationFrame(render);
 }
 
-function typeOpeningText() {
-  const paragraphs = [...document.querySelectorAll(".present-opening__content p")];
-  if (!paragraphs.length) return;
-
-  const lines = paragraphs.map((paragraph) => {
-    if (!paragraph.dataset.fullText) {
-      paragraph.dataset.fullText = paragraph.textContent.trim();
-    }
-    paragraph.textContent = "";
-    paragraph.classList.remove("is-current", "is-complete");
-    return paragraph.dataset.fullText;
-  });
-
-  let paragraphIndex = 0;
-  let charIndex = 0;
-
-  function typeNextCharacter() {
-    const paragraph = paragraphs[paragraphIndex];
-    const text = lines[paragraphIndex];
-    if (!paragraph || !text) return;
-
-    paragraphs.forEach((item) => item.classList.remove("is-current"));
-    paragraph.classList.add("is-current");
-    paragraph.textContent = text.slice(0, charIndex + 1);
-    charIndex += 1;
-
-    if (charIndex < text.length) {
-      window.setTimeout(typeNextCharacter, 34);
-      return;
-    }
-
-    paragraph.classList.remove("is-current");
-    paragraph.classList.add("is-complete");
-    paragraphIndex += 1;
-    charIndex = 0;
-
-    if (paragraphIndex < paragraphs.length) {
-      window.setTimeout(typeNextCharacter, 360);
-    }
-  }
-
-  window.setTimeout(typeNextCharacter, 780);
-}
-
-function showLyricMoment() {
-  if (!lyricMoment || !lyricStars || !lyricText) return;
-
-  lyricMomentShown = true;
-  lyricMoment.classList.remove("is-visible");
-  lyricStars.replaceChildren();
-  lyricText.textContent = "";
-  window.clearInterval(lyricTypingTimer);
-
-  for (let index = 0; index < 42; index += 1) {
-    const star = document.createElement("span");
-    const size = Math.random() * 0.9 + 0.55;
-    star.style.left = `${Math.random() * 100}%`;
-    star.style.top = `${Math.random() * 100}%`;
-    star.style.setProperty("--delay", `${Math.random() * 0.8}s`);
-    star.style.setProperty("--scale", size.toFixed(2));
-    lyricStars.appendChild(star);
-  }
-
-  requestAnimationFrame(() => {
-    lyricMoment.classList.add("is-visible");
-  });
-
-  const fullText = lyricText.dataset.fullText || "";
-  let currentIndex = 0;
-  lyricTypingTimer = window.setInterval(() => {
-    lyricText.textContent = fullText.slice(0, currentIndex + 1);
-    currentIndex += 1;
-
-    if (currentIndex >= fullText.length) {
-      window.clearInterval(lyricTypingTimer);
-    }
-  }, 42);
-
-  window.setTimeout(() => {
-    lyricMoment.classList.remove("is-visible");
-    window.clearInterval(lyricTypingTimer);
-  }, 5000);
-}
-
-function watchLyricMoment() {
-  if (loveSong.currentTime < LYRIC_MOMENT_TIME - 2) {
-    lyricMomentShown = false;
-  }
-
-  if (!lyricMomentShown && loveSong.currentTime >= LYRIC_MOMENT_TIME) {
-    showLyricMoment();
-  }
-}
-
-async function startMusic(options = {}) {
-  const wasPaused = loveSong.paused;
-  const showHearts = options.hearts !== false;
-
-  try {
-    if (loveSong.currentTime >= AUDIO_END_TIME) {
-      loveSong.currentTime = 0;
-    }
-    await loveSong.play();
-    document.body.classList.add("is-playing");
-    if (wasPaused) {
-      if (storyPausedAt) {
-        resumeStoryProgress();
-      } else {
-        startStoryProgress();
-      }
-      if (showHearts) {
-        floatHearts();
-      }
-    }
-  } catch {
-    document.body.classList.remove("is-playing");
-    if (musicStatus) {
-      musicStatus.textContent = "";
-    }
-  }
-  syncPlayer();
-}
-
-function toggleMusic() {
-  if (loveSong.paused) {
-    startMusic();
-    return;
-  }
-
-  loveSong.pause();
-  document.body.classList.remove("is-playing");
-  pauseStoryProgress();
-  syncPlayer();
-}
-
-playButtons.forEach((button) => {
-  button.addEventListener("click", (event) => {
-    event.stopPropagation();
-    toggleMusic();
-  });
-});
-
-if (openPresent && presentOpening) {
-  openPresent.addEventListener("click", (event) => {
-    event.stopPropagation();
-    if (presentOpening.classList.contains("is-opened")) return;
-    presentOpening.classList.add("is-opened");
-    floatHearts({ count: 96, intense: true });
-    typeOpeningText();
-    window.setTimeout(() => startPresent?.focus(), 700);
-    window.setTimeout(() => presentOpening.classList.add("is-gift-gone"), 1280);
-  });
-}
-
-if (startPresent) {
-  startPresent.addEventListener("click", (event) => {
-    event.stopPropagation();
-    document.body.classList.remove("has-present-opening");
-    presentOpening?.classList.add("is-hidden");
-    showStory(0);
-    syncPlayer();
-  });
-}
-
-if (openLetter) {
-  openLetter.addEventListener("click", (event) => {
-    event.stopPropagation();
-    openLetter.closest(".letter-status")?.classList.add("is-letter-open");
-    floatFlowers({ count: 90 });
-  });
-}
-
-if (showInviteButton && finalCounter && inviteNote) {
-  showInviteButton.addEventListener("click", (event) => {
-    event.stopPropagation();
-    finalCounter.classList.add("is-invite-visible");
-    inviteNote.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    resumeStoryProgress();
-    floatFlowers({ count: 70 });
-  });
-}
-
-if (acceptInviteButton) {
-  acceptInviteButton.addEventListener("click", (event) => {
-    event.stopPropagation();
-    window.location.href = WHATSAPP_INVITE_URL;
-  });
-}
-
-seekBar.addEventListener("click", (event) => {
-  event.stopPropagation();
-  const duration = Math.min(loveSong.duration || AUDIO_END_TIME, AUDIO_END_TIME);
-  if (!duration) return;
-
-  const bounds = seekBar.getBoundingClientRect();
-  const ratio = Math.max(0, Math.min(1, (event.clientX - bounds.left) / bounds.width));
-  loveSong.currentTime = ratio * duration;
-  syncPlayer();
-});
-
-restartMusic.addEventListener("click", (event) => {
-  event.stopPropagation();
-  loveSong.currentTime = 0;
-  startMusic();
-});
-
-backMusic.addEventListener("click", (event) => {
-  event.stopPropagation();
-  loveSong.currentTime = Math.max(0, loveSong.currentTime - 10);
-  syncPlayer();
-});
-
-forwardMusic.addEventListener("click", (event) => {
-  event.stopPropagation();
-  loveSong.currentTime = Math.min(AUDIO_END_TIME, loveSong.currentTime + 10);
-  syncPlayer();
-});
-
-loopMusic.addEventListener("click", (event) => {
-  event.stopPropagation();
-  loveSong.loop = !loveSong.loop;
-  loopMusic.classList.toggle("is-active", loveSong.loop);
-});
-
-loveSong.addEventListener("loadedmetadata", syncPlayer);
-loveSong.addEventListener("timeupdate", () => {
-  if (loveSong.currentTime >= AUDIO_END_TIME) {
-    loveSong.pause();
-    loveSong.currentTime = AUDIO_END_TIME;
-    document.body.classList.remove("is-playing");
-    pauseStoryProgress();
-  }
-  syncPlayer();
-});
-loveSong.addEventListener("play", syncPlayer);
-loveSong.addEventListener("pause", syncPlayer);
-
-function updateCounter() {
-  const now = new Date();
-  let years = now.getFullYear() - START_DATE.getFullYear();
-  let months = now.getMonth() - START_DATE.getMonth();
-  let days = now.getDate() - START_DATE.getDate();
-  let hours = now.getHours() - START_DATE.getHours();
-  let minutes = now.getMinutes() - START_DATE.getMinutes();
-  let seconds = now.getSeconds() - START_DATE.getSeconds();
-
-  if (seconds < 0) {
-    seconds += 60;
-    minutes -= 1;
-  }
-  if (minutes < 0) {
-    minutes += 60;
-    hours -= 1;
-  }
-  if (hours < 0) {
-    hours += 24;
-    days -= 1;
-  }
-  if (days < 0) {
-    const previousMonth = new Date(now.getFullYear(), now.getMonth(), 0);
-    days += previousMonth.getDate();
-    months -= 1;
-  }
-  if (months < 0) {
-    months += 12;
-    years -= 1;
-  }
-
-  document.querySelector("[data-count='years']").textContent = years;
-  document.querySelector("[data-count='months']").textContent = months;
-  document.querySelector("[data-count='days-part']").textContent = days;
-  document.querySelector("[data-count='hours-part']").textContent = hours;
-  document.querySelector("[data-count='minutes-part']").textContent = minutes;
-  document.querySelector("[data-count='seconds-part']").textContent = seconds;
-}
-
-document.querySelectorAll("[data-next-story]").forEach((button) => {
-  button.addEventListener("click", (event) => {
-    event.stopPropagation();
-    nextStory();
-  });
-});
-
-document.querySelectorAll("[data-prev-story]").forEach((button) => {
-  button.addEventListener("click", (event) => {
-    event.stopPropagation();
-    prevStory();
-  });
-});
-
-storiesRoot.addEventListener("click", (event) => {
-  if (event.target.closest("button, a")) return;
-  if (shouldIgnoreTap) {
-    shouldIgnoreTap = false;
-    return;
-  }
-
-  const bounds = storiesRoot.getBoundingClientRect();
-  const x = event.clientX - bounds.left;
-  if (x < bounds.width * 0.34) {
-    prevStory();
-  } else {
-    nextStory();
-  }
-});
-
-storiesRoot.addEventListener("pointerdown", (event) => {
-  if (event.target.closest("button, a")) return;
-
-  holdStartedAt = performance.now();
-  shouldIgnoreTap = false;
-  storyHoldWasPlaying = !loveSong.paused;
-  if (storyHoldWasPlaying) {
-    loveSong.pause();
-    document.body.classList.remove("is-playing");
-    syncPlayer();
-  }
-  pauseStoryProgress();
-});
-
-function releaseStoryHold() {
-  if (!holdStartedAt) return;
-
-  shouldIgnoreTap = performance.now() - holdStartedAt > 220;
-  holdStartedAt = 0;
-  const shouldResumeMusic = storyHoldWasPlaying;
-  storyHoldWasPlaying = false;
-  resumeStoryProgress();
-  if (shouldResumeMusic) {
-    startMusic({ hearts: false });
-  }
-}
-
-window.addEventListener("pointerup", releaseStoryHold);
-window.addEventListener("pointercancel", releaseStoryHold);
-window.addEventListener("blur", releaseStoryHold);
-
-window.addEventListener("keydown", (event) => {
-  if (event.key === "ArrowRight" || event.key === " ") nextStory();
-  if (event.key === "ArrowLeft") prevStory();
-});
-
-window.addEventListener("resize", resizeStars);
-showStory(0);
-updateCounter();
-setInterval(updateCounter, 1000);
-syncPlayer();
-resizeStars();
-drawStars();
-setTimeout(() => {
-  giftLoader?.classList.add("is-hidden");
-}, 1700);
-
+function restartAnimation(){cancelAnimationFrame(frame);root.classList.remove("phase-embers","phase-wings","phase-flight","phase-complete");startedAt=0;lastAt=0;burstDone=false;lastColorStep=-1;root.style.setProperty("--color-progress",0);seed();frame=requestAnimationFrame(render);}
+window.restartAnimation=restartAnimation;window.PHOENIX_CONFIG=PHOENIX_CONFIG;
+function scheduleResize(){cancelAnimationFrame(resizeFrame);resizeFrame=requestAnimationFrame(()=>{resize();seed();});}
+function startMusic(){loveSong.volume=.72;const attempt=loveSong.play();if(attempt)attempt.catch(()=>{});}
+addEventListener("resize",scheduleResize,{passive:true});replay.addEventListener("click",restartAnimation);document.addEventListener("pointerdown",startMusic,{once:true,passive:true});resize();restartAnimation();startMusic();

@@ -1,0 +1,80 @@
+:root { color-scheme: dark; font-family: "DM Sans", sans-serif; background: #030203; color: #f4efeb; }
+/* Base e palco cinematográfico */
+* { box-sizing: border-box; }
+html, body { width: 100%; min-height: 100%; }
+body { margin: 0; overflow: hidden; background: #030203; }
+button, a { -webkit-tap-highlight-color: transparent; }
+
+.experience {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  min-height: 100svh;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 78%, #160806 0%, #070304 34%, #020102 72%);
+}
+#effects, .atmosphere { position: absolute; inset: 0; width: 100%; height: 100%; }
+#effects { z-index: 3; pointer-events: none; }
+.atmosphere { z-index: 1; pointer-events: none; }
+#effects, .atmosphere { filter: grayscale(calc(1 - var(--color-progress, 0))); }
+.volumetric-light {
+  position: absolute;
+  top: 17%; left: 50%;
+  width: min(74vw, 760px); aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(202,35,99,.13), rgba(121,19,66,.045) 42%, transparent 70%);
+  filter: blur(26px); opacity: 0; transform: translateX(-50%);
+  transition: opacity 2s ease;
+}
+.ground-glow {
+  position: absolute; left: 50%; bottom: 7%;
+  width: min(76vw,760px); height: 16%; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(255,103,34,.24), transparent 68%);
+  filter: blur(18px); opacity: .12; transform: translateX(-50%) scale(.5);
+  transition: opacity 1.6s ease, transform 2s ease;
+}
+.smoke {
+  position: absolute; bottom: -12%; width: 65%; height: 36%; border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(70,57,54,.2), transparent 70%);
+  filter: blur(32px); animation: smokeDrift 10s ease-in-out infinite alternate;
+}
+.smoke--one { left: -15%; }
+.smoke--two { right: -15%; animation-delay: -5s; }
+.phase-embers .ground-glow { opacity: .75; transform: translateX(-50%) scale(1); }
+.phase-wings .volumetric-light, .phase-flight .volumetric-light { opacity: .72; }
+
+/* Conteúdo minimalista revelado após a formação da fênix */
+.message {
+  position: absolute; z-index: 6; left: 50%; bottom: max(30px,env(safe-area-inset-bottom));
+  width: min(90%,480px); text-align: center; opacity: 0; transform: translate(-50%,12px);
+  pointer-events: none; transition: opacity 1s ease, transform 1s ease;
+}
+.phase-complete .message { opacity: 1; transform: translate(-50%,0); pointer-events: auto; }
+.message::before {
+  position: absolute; z-index: -1; inset: -40px -12vw -24px;
+  background: radial-gradient(ellipse, rgba(2,1,2,.94) 8%, rgba(2,1,2,.68) 54%, transparent 74%); content: "";
+}
+.message__eyebrow { margin: 0 0 9px; color: #c88d6a; font-size: 9px; font-weight: 500; letter-spacing: .28em; }
+h1 { margin: 0; font-family: "DM Sans",sans-serif; font-size: clamp(25px,7vw,39px); font-weight: 500; letter-spacing: .03em; line-height: 1.14; }
+h1 em { color: #e78c59; font-style: normal; font-weight: 500; }
+.message__instruction { margin: 13px 0 10px; color: #918789; font-size: 9px; font-weight: 500; letter-spacing: .22em; }
+.message__button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  width: min(100%,260px); min-height: 47px; border: 1px solid rgba(231,140,89,.38); border-radius: 999px;
+  background: rgba(126,38,30,.64); color: #f8f3ef; font-size: 13px; font-weight: 500; text-decoration: none;
+  backdrop-filter: blur(9px); transition: background .2s ease, transform .2s ease;
+}
+.message__button:hover { background: rgba(164,50,35,.8); transform: translateY(-2px); }
+.message__button svg,.replay svg { width: 17px; fill:none; stroke:currentColor; stroke-linecap:round; stroke-linejoin:round; stroke-width:1.6; }
+.message__button:focus-visible,.replay:focus-visible { outline:2px solid rgba(239,151,95,.6); outline-offset:4px; }
+/* Controle discreto para executar novamente a entrada */
+.replay {
+  position:absolute; z-index:8; top:max(16px,env(safe-area-inset-top)); right:16px;
+  display:grid; width:40px; height:40px; place-items:center; border:1px solid rgba(255,255,255,.1); border-radius:50%;
+  background:rgba(4,2,3,.42); color:#b8abad; opacity:0; cursor:pointer; backdrop-filter:blur(8px); transition:opacity .5s ease;
+}
+.phase-complete .replay { opacity:1; }
+@keyframes smokeDrift { to { transform:translate(11%,-6%) scale(1.1); } }
+@media (min-width:760px) { .message { bottom:28px; } h1 { font-size:38px; } }
+@media (max-height:680px) { .message { bottom:12px; } h1 { font-size:25px; } .message__instruction { margin:8px 0; } .message__button { min-height:43px; } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
