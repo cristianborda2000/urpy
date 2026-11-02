@@ -1,4 +1,4 @@
-# Urpy & Cristhian - Dia dos Namorados
+﻿# Urpy & Cristhian - Dia dos Namorados
 
 Abra `index.html` no navegador ou use `abrir-surpresa.url`.
 
@@ -33,3 +33,34 @@ celulares, o navegador pode bloquear autoplay com som; nesse caso, use o botao d
 
 A carta final abre quando toca no envelope. Para mudar a mensagem, edite o conteudo dentro de
 `.envelope__letter` em `index.html`.
+
+## Chat com histórico
+
+Execute `node local-server.js` e abra `http://localhost:5500/chat.html`.
+Abra o chat e escreva: n?o h? cadastro nem campo de nome. A p?gina sem convite abre a conversa compartilhada padr?o. Ambos acessam o chat diretamente pelo site, sem bot?o de convite.
+As mensagens são salvas em `chat-data/` no servidor e sobrevivem a reinicializações.
+Faça backup dessa pasta; ela não entra no Git. Não há criptografia de ponta a ponta.
+Quem possui o link tem acesso à conversa. O nome é livre, sem autenticação de identidade.
+
+Para celulares na mesma rede, execute no PowerShell:
+
+```powershell
+$env:HOST = '0.0.0.0'
+node local-server.js
+```
+
+Acesse `http://IP-DO-COMPUTADOR:5500/chat.html` e copie o convite a partir desse endereço.
+O computador deve estar ligado e a porta acessível na rede. `localhost` só funciona no próprio computador.
+Para conversar pela internet, é necessário hospedar o servidor Node com HTTPS e armazenamento persistente.
+Hospedagens apenas estáticas não executam a API do chat.
+
+O botão Música abre o player do vídeo `clnvpWmBqOc`; há um link alternativo para o YouTube.
+O áudio desse vídeo não foi baixado. O player requer internet e depende de o vídeo permitir incorporação.
+
+## Acesso direto e resposta
+
+A página inicial mantém a fênix e o botão Abrir chat. `/chat.html` mostra somente a conversa, com layout para celular.
+Para responder, abra `/responder.html` no mesmo servidor. Os dois endereços usam a mesma conversa padrão.
+A identificação de quem responde fica separada neste navegador; o endereço não é uma autenticação de administrador.
+A página anterior com a fênix foi preservada em `/fenix.html`.
+Os endereços localhost funcionam apenas neste computador. O acesso pela internet depende da publicação do servidor.

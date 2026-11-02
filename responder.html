@@ -1,0 +1,22 @@
+﻿<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#075e54">
+  <title>Responder</title>
+  <link rel="stylesheet" href="chat.css">
+</head>
+<body data-responder="true">
+  <main class="conversation" aria-label="Conversa">
+    <header><span class="connection-dot" aria-hidden="true"></span><span id="status" role="status">Conectando…</span><button id="music-toggle" type="button" aria-label="Reproduzir música">Reproduzir música</button></header>
+    <div id="messages" role="log" aria-label="Mensagens" aria-live="polite"><div class="empty"><p>Escreva sua primeira mensagem.</p></div></div>
+    <p id="notice" role="alert"></p>
+    <form id="composer">
+      <textarea id="text" rows="1" maxlength="4000" placeholder="Mensagem" aria-label="Mensagem" enterkeyhint="enter" required></textarea>
+      <button id="send" type="submit" aria-label="Enviar mensagem"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4 4 17 8-17 8 3-8-3-8Zm3 8h14"/></svg></button>
+    </form>
+  </main>
+  <script src="chat.js"></script>
+</body>
+</html>

@@ -78,3 +78,18 @@ h1 em { color: #e78c59; font-style: normal; font-weight: 500; }
 @media (min-width:760px) { .message { bottom:28px; } h1 { font-size:38px; } }
 @media (max-height:680px) { .message { bottom:12px; } h1 { font-size:25px; } .message__instruction { margin:8px 0; } .message__button { min-height:43px; } }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+
+/* A conversa fica acessível desde o primeiro instante. */
+.message{width:min(90%,620px);opacity:1;transform:translate(-50%,0);pointer-events:auto;bottom:max(32px,env(safe-area-inset-bottom))}
+.message__eyebrow{font-size:10px;color:#e4b783;letter-spacing:.3em}
+.message h1{font-family:"Cinzel",serif;font-size:clamp(22px,3.2vw,37px);line-height:1.25;letter-spacing:-.02em}
+.message h1 em{color:#f6bc7b}
+.message__subtitle{font-size:13px;line-height:1.6;color:#b9a79b;margin:12px 0 20px}
+.message__button{width:min(100%,390px);min-height:72px;font-size:21px;letter-spacing:.12em;font-weight:700;border:1px solid #ffd399;background:linear-gradient(115deg,#ae421f,#e78d43 55%,#f5b568);color:#231009;box-shadow:0 8px 40px #ed6e2c35,inset 0 1px 0 #ffe2ad99}
+.message__button:hover{background:linear-gradient(115deg,#d35b2e,#ffb264);transform:translateY(-3px);box-shadow:0 12px 50px #ed6e2c55}
+.message__button svg{width:24px;stroke-width:2}
+.volumetric-light{background:radial-gradient(circle,rgba(255,138,39,.18),rgba(172,49,17,.06) 42%,transparent 70%)}
+@media(max-width:600px){.message{bottom:25px}.message__subtitle{font-size:12px;margin:10px 0 16px}.message__button{min-height:66px;font-size:20px}.message::before{inset:-22px -12vw -30px}}
+@media(max-height:650px){.message{bottom:14px}.message h1{font-size:20px}.message__subtitle{margin:7px 0 10px}.message__button{min-height:55px}.message__eyebrow{font-size:8px}}
+
+.chat-screen{position:fixed;inset:0;z-index:20;width:100%;height:100dvh;border:0;background:#e6ede7;display:block}
