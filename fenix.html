@@ -1,41 +1,57 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#050304" />
-    <meta name="description" content="Das cinzas, um novo começo." />
-    <title>Nosso novo começo</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <main class="experience" data-experience>
-      <canvas id="effects" aria-hidden="true"></canvas>
-      <audio id="loveSong" src="assets/audio/grupo-5-el-secreto.mp3" loop preload="auto" playsinline></audio>
-
-      <div class="atmosphere" aria-hidden="true">
-        <div class="volumetric-light"></div>
-        <div class="ground-glow"></div>
-        <div class="smoke smoke--one"></div>
-        <div class="smoke smoke--two"></div>
-      </div>
-
-      <section class="message" aria-label="Abrir conversa">
-        <p class="message__eyebrow">DAS CINZAS, UM NOVO COMEÇO</p>
-        <p class="message__subtitle">Tem um lugar aqui, só esperando a sua mensagem.</p>
-        <a class="message__button" href="chat.html">
-          ABRIR CHAT
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-        </a>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#f5f7f8">
+  <meta name="description" content="Urpy. Um jeito simples de manter a conversa em dia.">
+  <title>Urpy — Conversas, com simplicidade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <audio id="loveSong" src="assets/audio/grupo-5-el-secreto.mp3" loop preload="metadata" playsinline></audio>
+  <div class="page" id="landing">
+    <header class="site-header">
+      <a class="wordmark" href="index.html" aria-label="Urpy, início"><svg viewBox="0 0 32 32" aria-hidden="true"><path d="M5 8c6 1 9 4 11 9C18 11 23 7 29 5c-2 7-6 12-12 15L13 28l-2-7C7 18 5 14 5 8Z"/></svg>urpy<span class="wordmark-dot">.</span></a>
+      <button class="sound-button" id="home-music" type="button" aria-label="Reproduzir música"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13M9 8l11-2"/><ellipse cx="6" cy="18" rx="3" ry="2"/><ellipse cx="17" cy="16" rx="3" ry="2"/></svg><span>Música</span></button>
+    </header>
+    <main class="hero">
+      <section class="hero-copy">
+        <p class="eyebrow"><span></span> CONEXÕES DO DIA A DIA</p>
+        <h1>Converse.<br>Simples assim<span class="accent">.</span></h1>
+        <p class="intro">Um espaço leve e direto para trocar mensagens<br class="desktop-break"> e manter a conversa em dia.</p>
+        <a class="open-chat" href="chat.html"><span>Abrir chat</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6"/></svg></a>
+        <p class="access-note">Sem cadastro. É só entrar e conversar.</p>
       </section>
-
-      <button class="replay" type="button" data-replay aria-label="Repetir animação">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7" /></svg>
-      </button>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="visual-grid"></div>
+        <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+        <div class="bird-disc">
+          <svg class="bird" viewBox="0 0 360 360" fill="none">
+            <defs><linearGradient id="wing" x1="75" y1="100" x2="270" y2="265" gradientUnits="userSpaceOnUse"><stop stop-color="#58c7b0"/><stop offset="1" stop-color="#077d74"/></linearGradient><linearGradient id="body" x1="170" y1="110" x2="225" y2="260" gradientUnits="userSpaceOnUse"><stop stop-color="#143f43"/><stop offset="1" stop-color="#246c69"/></linearGradient></defs>
+            <path d="M180 220C118 214 79 172 59 104c53 11 95 48 121 116Z" fill="url(#wing)"/>
+            <path d="M180 220C131 203 104 177 81 137c31 10 68 41 99 83Z" fill="#fff" fill-opacity=".18"/>
+            <path d="M177 220c20-76 66-121 128-144-17 69-61 118-128 144Z" fill="url(#wing)"/>
+            <path d="M177 220c32-56 66-91 107-117-22 47-60 85-107 117Z" fill="#fff" fill-opacity=".18"/>
+            <path d="M177 221c-12-32-10-69 16-89l26 1-14 12c-8 17-8 35-5 53l-24 43-26 45 6-54-37 30 28-40 30-1Z" fill="url(#body)"/>
+            <path d="m194 132 10-13 1 13m2 2 18 5-20 7" fill="#143f43"/>
+            <circle cx="199" cy="138" r="2.7" fill="#e6f4ed"/>
+          </svg>
+        </div>
+        <div class="visual-label"><span class="mini-icon"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 1-8 8H5l-3 3V11a9 9 0 0 1 18 0Z"/><path d="M7 9h8m-8 4h5"/></svg></span><div><strong>Uma boa conversa.</strong><span>De qualquer lugar.</span></div><span class="label-dot"></span></div>
+        <span class="floating-dot dot-one"></span><span class="floating-dot dot-two"></span>
+      </div>
     </main>
-    <script src="script.js"></script>
-  </body>
+    <section class="details" aria-label="Sobre a conversa">
+      <div><span class="detail-number">01</span><p><strong>Acesso direto</strong><span>Abra e comece a escrever.</span></p></div>
+      <div><span class="detail-number">02</span><p><strong>Histórico salvo</strong><span>Retome de onde parou.</span></p></div>
+      <div><span class="detail-number">03</span><p><strong>No seu ritmo</strong><span>No celular ou no computador.</span></p></div>
+    </section>
+    <footer class="site-footer"><span>urpy.com.br</span><span>Feito para conectar.</span></footer>
+  </div>
+  <script src="script.js"></script>
+</body>
 </html>
