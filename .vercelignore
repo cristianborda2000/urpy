@@ -1,0 +1,5 @@
+﻿sites/
+chat-data/
+*.log
+test-*.cjs
+test-*.mjs

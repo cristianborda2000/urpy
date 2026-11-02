@@ -1,0 +1,15 @@
+﻿import assert from 'node:assert/strict';
+import conversation from './api/conversation.mjs';
+import messages from './api/messages.mjs';
+const origin='https://urpy.com.br';
+const roomResponse=await conversation.fetch(new Request(origin+'/api/conversation'));
+assert.equal(roomResponse.status,200);const {room}=await roomResponse.json();
+const list=await messages.fetch(new Request(origin+'/api/messages',{headers:{'X-Chat-Room':room}}));assert.equal(list.status,200);assert.ok(Array.isArray(await list.json()));
+const realFetch=globalThis.fetch;let calls=0;
+globalThis.fetch=async(url,options)=>{calls++;assert.equal(url,'https://urpy-conversa.sprysheep1.chatgpt.site/api/messages');assert.equal(options.headers.get('origin'),null);assert.equal(options.headers.get('x-chat-room'),room);const body=JSON.parse(new TextDecoder().decode(options.body));assert.equal(body.text,'teste');return Response.json(body,{status:201});};
+const post=(headers={},text='teste')=>new Request(origin+'/api/messages',{method:'POST',headers:{Origin:origin,'X-Chat-Room':room,'Content-Type':'application/json',...headers},body:JSON.stringify({text})});
+assert.equal((await messages.fetch(post())).status,201);assert.equal(calls,1);
+assert.equal((await messages.fetch(post({Origin:'https://other.example'}))).status,403);
+assert.equal((await messages.fetch(post({},'x'.repeat(21000)))).status,413);
+assert.equal(calls,1);globalThis.fetch=realFetch;
+console.log('PASS: real backend connection, history read, POST proxy, origin validation and size limit. No test messages saved.');

@@ -64,3 +64,8 @@ Para responder, abra `/responder.html` no mesmo servidor. Os dois endereços usa
 A identificação de quem responde fica separada neste navegador; o endereço não é uma autenticação de administrador.
 A página anterior com a fênix foi preservada em `/fenix.html`.
 Os endereços localhost funcionam apenas neste computador. O acesso pela internet depende da publicação do servidor.
+
+## Chat no dominio da Vercel
+
+As funcoes `api/conversation.mjs` e `api/messages.mjs` conectam o site da Vercel ao banco persistente do Sites. O navegador usa o mesmo dominio para paginas e mensagens. Nao e necessario mudar os registros DNS para esta configuracao.
+O backend e https://urpy-conversa.sprysheep1.chatgpt.site. O historico fica nesse backend; nao e gravado no disco temporario das funcoes da Vercel.
