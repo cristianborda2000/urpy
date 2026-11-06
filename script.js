@@ -21,6 +21,7 @@ function stopGestureListeners() {
   document.removeEventListener('keydown', unlockMusic);
 }
 async function startMusic() {
+  if (window.urpyMaintenance?.enabled) return;
   try {
     await loveSong.play();
     hasPlayed = true;
@@ -41,6 +42,10 @@ document.addEventListener('click', unlockMusic);
 document.addEventListener('touchend', unlockMusic, { passive: true });
 document.addEventListener('keydown', unlockMusic);
 musicButton.addEventListener('click', () => loveSong.paused ? startMusic() : loveSong.pause());
+window.addEventListener('maintenancechange', () => {
+  if (window.urpyMaintenance?.enabled) loveSong.pause();
+  else if (location.hash === '#chat') showChat();
+});
 loveSong.addEventListener('play', () => {
   hasPlayed = true;
   needsGesture = false;
@@ -49,7 +54,7 @@ loveSong.addEventListener('play', () => {
 });
 loveSong.addEventListener('pause', updateMusic);
 function showChat() {
-  if (chatFrame) return;
+  if (chatFrame || window.urpyMaintenance?.enabled) return;
   landing.hidden = true;
   document.body.classList.add('chat-open');
   chatFrame = document.createElement('iframe');
@@ -67,6 +72,7 @@ function closeChat() {
   openButton.focus();
 }
 openButton.addEventListener('click', event => {
+  if (window.urpyMaintenance?.enabled) { event.preventDefault(); return; }
   if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
   event.preventDefault();
   if (!hasPlayed) startMusic();

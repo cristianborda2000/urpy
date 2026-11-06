@@ -8,6 +8,15 @@ const sender = read(senderKey) || token();
 save(senderKey, sender);
 let signature = '', sending = false, pending = null;
 
+function syncComposer() {
+  const paused = window.urpyMaintenance?.enabled === true;
+  $('text').disabled = paused;
+  $('send').disabled = sending || paused;
+  $('text').placeholder = paused ? 'Envio pausado durante a manutenção' : 'Escreva uma mensagem…';
+}
+window.addEventListener('maintenancechange', syncComposer);
+syncComposer();
+
 function setConnection(online) {
   document.body.dataset.connection = online ? 'online' : 'offline';
   $('status').textContent = online ? 'Conectado · histórico salvo' : 'Reconectando…';
@@ -71,7 +80,7 @@ async function refresh() {
 }
 $('composer').addEventListener('submit', async event => {
   event.preventDefault();
-  if (sending) return;
+  if (sending || window.urpyMaintenance?.enabled) return;
   const text = $('text').value.trim();
   const name = 'Participante';
   if (!/^[a-f0-9]{48}$/.test(room)) {
@@ -85,6 +94,13 @@ $('composer').addEventListener('submit', async event => {
   if (!pending || pending.text !== text || pending.name !== name) pending = { id: token(), name, text, sender };
   try {
     const response = await fetch('/api/messages', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Chat-Room': room }, body: JSON.stringify(pending) });
+    if (response.status === 503) {
+      const result = await response.json();
+      if (result.code === 'MAINTENANCE') {
+        window.urpyMaintenance?.markActive();
+        return;
+      }
+    }
     if (!response.ok) throw Error();
     if ($('text').value.trim() === text) {
       $('text').value = '';
@@ -97,8 +113,8 @@ $('composer').addEventListener('submit', async event => {
     $('notice').textContent = 'Não foi possível confirmar o envio. Sua mensagem está aqui; tente novamente.';
   } finally {
     sending = false;
-    $('send').disabled = false;
-    $('text').focus();
+    syncComposer();
+    if (!window.urpyMaintenance?.enabled) $('text').focus();
   }
 });
 $('text').addEventListener('keydown', event => {
@@ -132,6 +148,9 @@ if (!chatAudio) {
   document.body.append(chatAudio);
 }
 const musicToggle = $('music-toggle');
+window.addEventListener('maintenancechange', () => {
+  if (window.urpyMaintenance?.enabled && document.body.dataset.responder !== 'true') chatAudio.pause();
+});
 function syncMusicButton() {
   const playing = !chatAudio.paused;
   const label = playing ? 'Pausar música' : 'Reproduzir música';

@@ -62,6 +62,25 @@ O áudio desse vídeo não foi baixado. O player requer internet e depende de o 
 A página inicial mantém a fênix e o botão Abrir chat. `/chat.html` mostra somente a conversa, com layout para celular.
 Para responder, abra `/responder.html` no mesmo servidor. Os dois endereços usam a mesma conversa padrão.
 A identificação de quem responde fica separada neste navegador; o endereço não é uma autenticação de administrador.
+
+## Modo manutenção
+
+Em `/responder.html`, use **Ativar manutenção** para exibir “Página em manutenção”
+na página inicial e no chat dos visitantes. Use **Encerrar manutenção** para reabrir.
+As páginas abertas verificam o estado a cada dois segundos e voltam automaticamente.
+A página de resposta continua acessível, com o histórico preservado; o envio de novas
+mensagens fica pausado para todos durante a manutenção. Rascunhos não são apagados.
+
+O estado é salvo no servidor (arquivo `chat-data/maintenance.json` no servidor local,
+tabela `site_maintenance` no backend Sites), portanto vale entre navegadores e sobrevive
+a reinicializações. Para usar no domínio publicado, publique também a API e a migração
+do backend, além dos arquivos da interface. O controle mantém o modelo de acesso atual:
+não há login administrativo; quem acessar a página de resposta pode alterar o estado.
+
+Execute `node local-server.js` e abra `http://localhost:5500/responder.html` para usar localmente.
+
+## Página anterior
+
 A página anterior com a fênix foi preservada em `/fenix.html`.
 Os endereços localhost funcionam apenas neste computador. O acesso pela internet depende da publicação do servidor.
 
